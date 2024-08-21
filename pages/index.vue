@@ -1,5 +1,5 @@
 <template>
-  <div class="flex h-screen flex-col items-center justify-center">
+  <div class="flex h-screen flex-col items-center justify-center p-4">
     <UTabs
       v-if="!studying"
       :items="items"
@@ -15,7 +15,7 @@
       </template>
       <template #item="{ item }">
         <div v-if="item.label === 'Pomodoro'">
-          <div class="flex flex-row items-center justify-center space-x-4 p-4">
+          <div class="flex flex-col items-center justify-center space-x-4 p-4 md:flex-row">
             <UInput
               v-model="pomodoroStudyTime"
               icon="i-heroicons-pencil"
@@ -56,7 +56,7 @@
           </div>
         </div>
         <div v-else-if="item.label === 'Countdown'">
-          <div class="flex flex-row items-center justify-center space-x-4 p-4">
+          <div class="flex flex-col items-center justify-center space-x-4 p-4 md:flex-row">
             <UInput
               v-model="countdownTime"
               icon="i-heroicons-clock"
@@ -108,7 +108,7 @@
       </p>
       <Transition>
         <UButton
-          v-if="showStopButton"
+          v-if="showStopButton || width >= 768"
           size="lg"
           @click="stopStudySession"
         >
@@ -120,6 +120,7 @@
 </template>
 
 <script setup lang="ts">
+const { width } = useWindowSize();
 const { x, y } = useMouse();
 
 const className = ref('');
