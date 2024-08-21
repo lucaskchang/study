@@ -3,7 +3,7 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   app: {
     head: {
-      title: 'Bay Clock 3',
+      title: 'Study Timer',
       htmlAttrs: {
         lang: 'en',
       },
@@ -20,8 +20,6 @@ export default defineNuxtConfig({
   css: ['@/assets/css/styles.scss'],
   modules: [
     '@nuxt/ui',
-    '@nuxt/image',
-    '@nuxtjs/google-fonts',
     'nuxt-gtag',
     '@nuxt/eslint',
     '@pinia/nuxt',
@@ -31,11 +29,7 @@ export default defineNuxtConfig({
     classSuffix: '',
   },
   googleFonts: {
-    families: {
-      'Inter': true,
-      'Patrick Hand': true,
-      'Nunito': true,
-    },
+    families: {},
   },
   gtag: {
     id: 'G-QNLZ5NY7HH',
