@@ -15,7 +15,7 @@
       </template>
       <template #item="{ item }">
         <div v-if="item.label === 'Pomodoro'">
-          <div class="flex flex-col items-center justify-center space-x-4 p-4 md:flex-row">
+          <div class="flex flex-col items-center justify-center space-y-4 p-4 md:flex-row md:space-x-4 md:space-y-0">
             <UInput
               v-model="pomodoroStudyTime"
               icon="i-heroicons-pencil"
@@ -49,14 +49,14 @@
             />
             <UButton
               size="lg"
-              @click="startPomodoroStudy"
+              @click="startPomodoro"
             >
               Start Studying
             </UButton>
           </div>
         </div>
         <div v-else-if="item.label === 'Countdown'">
-          <div class="flex flex-col items-center justify-center space-x-4 p-4 md:flex-row">
+          <div class="flex flex-col items-center justify-center space-y-4 p-4 md:flex-row md:space-x-4 md:space-y-0">
             <UInput
               v-model="countdownTime"
               icon="i-heroicons-clock"
@@ -76,8 +76,37 @@
               size="lg"
               @click="startCountdown"
             >
-              Start Countdown
+              Start Studying
             </UButton>
+          </div>
+        </div>
+        <div v-else-if="item.label === 'Stats'">
+          <div class="flex flex-col items-center p-4">
+            <div class="flex flex-row space-x-4">
+              <p class="w-48">
+                Pomodoro Study Time:
+              </p>
+              <p class="w-32 text-right">
+                {{ formatTime(totalPomodoroTime) }}
+              </p>
+            </div>
+            <div class="flex flex-row space-x-4">
+              <p class="w-48">
+                Countdown Study Time:
+              </p>
+              <p class="w-32 text-right">
+                {{ formatTime(totalCountdownTime) }}
+              </p>
+            </div>
+            <UDivider class="my-2 w-96" />
+            <div class="flex flex-row space-x-4">
+              <p class="w-48">
+                Total Study Time:
+              </p>
+              <p class="w-32 text-right">
+                {{ formatTime(totalPomodoroTime + totalCountdownTime) }}
+              </p>
+            </div>
           </div>
         </div>
       </template>
@@ -91,24 +120,24 @@
         class="text-4xl font-bold"
       >
         <p v-if="onBreak">
-          Break #{{ currentRepitition }}<span v-if="className"> - {{ className }}</span>
+          Break #{{ currentRepitition }}<span v-if="className !== ''"> - {{ className }}</span>
         </p>
         <p v-else>
-          Study Session #{{ currentRepitition }}<span v-if="className"> - {{ className }}</span>
+          Study Session #{{ currentRepitition }}<span v-if="className !== ''"> - {{ className }}</span>
         </p>
       </div>
       <p
         v-else
         class="text-4xl font-bold"
       >
-        Studying - {{ className }}
+        Studying<span v-if="className !== ''"> - {{ className }}</span>
       </p>
       <p class="text-8xl font-bold">
-        {{ Math.floor(timeLeft / 60) }}:{{ (timeLeft % 60).toString().padStart(2, '0') }}
+        {{ formatTime(timeLeft) }}
       </p>
       <Transition>
         <UButton
-          v-if="showStopButton || width >= 768"
+          v-if="showStopButton || 768 > width"
           size="lg"
           @click="stopStudySession"
         >
@@ -116,6 +145,9 @@
         </UButton>
       </Transition>
     </div>
+    <Transition>
+      <ColorMode v-if="!studying" />
+    </Transition>
   </div>
 </template>
 
@@ -124,7 +156,7 @@ const { width } = useWindowSize();
 const { x, y } = useMouse();
 
 const className = ref('');
-const countdownTime = ref(0);
+const countdownTime = ref(30);
 const pomodoroStudyTime = ref(25);
 const pomodoroBreakTime = ref(5);
 const pomodoroRepititions = ref();
@@ -134,9 +166,17 @@ const timeLeft = ref(0);
 const studying = ref(false);
 const onBreak = ref(false);
 const showStopButton = ref(false);
+const totalPomodoroTime = ref(0);
+const totalCountdownTime = ref(0);
+const doneSound = new Audio('/ding.mp3');
 let studyInterval: NodeJS.Timeout;
 let breakInterval: NodeJS.Timeout;
 let stopButtonInterval: NodeJS.Timeout;
+
+function startPomodoro() {
+  currentRepitition.value = 0;
+  startPomodoroStudy();
+}
 
 function startPomodoroStudy() {
   pomodoro.value = true;
@@ -145,8 +185,11 @@ function startPomodoroStudy() {
   timeLeft.value = Math.round(pomodoroStudyTime.value * 60);
   studyInterval = setInterval(() => {
     timeLeft.value -= 1;
+    totalPomodoroTime.value += 1;
+    localStorage.setItem('totalPomodoroTime', totalPomodoroTime.value.toString());
     if (timeLeft.value <= 0) {
       clearInterval(studyInterval);
+      doneSound.play();
       if (currentRepitition.value < pomodoroRepititions.value) {
         onBreak.value = true;
         startPomodoroBreak();
@@ -166,6 +209,7 @@ function startPomodoroBreak() {
   breakInterval = setInterval(() => {
     timeLeft.value -= 1;
     if (timeLeft.value <= 0) {
+      doneSound.play();
       clearInterval(breakInterval);
       onBreak.value = false;
       startPomodoroStudy();
@@ -180,7 +224,10 @@ function startCountdown() {
   timeLeft.value = Math.round(countdownTime.value * 60);
   studyInterval = setInterval(() => {
     timeLeft.value -= 1;
+    totalCountdownTime.value += 1;
+    localStorage.setItem('totalCountdownTime', totalCountdownTime.value.toString());
     if (timeLeft.value <= 0) {
+      doneSound.play();
       clearInterval(studyInterval);
       studying.value = false;
       return;
@@ -195,12 +242,34 @@ function stopStudySession() {
   onBreak.value = false;
 }
 
+function formatTime(time: number) {
+  const hours = Math.floor(time / 3600);
+  const formattedHours = hours ? `${hours}h ` : '';
+  const minutes = Math.floor((time % 3600) / 60);
+  const formattedMinutes = minutes ? `${minutes}m ` : '';
+  const seconds = time % 60;
+  return `${formattedHours}${formattedMinutes}${seconds}s`;
+}
+
 watch([x, y], () => {
   showStopButton.value = true;
   clearTimeout(stopButtonInterval);
   stopButtonInterval = setTimeout(() => {
     showStopButton.value = false;
   }, 2000);
+});
+
+onMounted(() => {
+  totalPomodoroTime.value = Number(localStorage.getItem('totalPomodoroTime')) || 0;
+  totalCountdownTime.value = Number(localStorage.getItem('totalCountdownTime')) || 0;
+});
+
+onUnmounted(() => {
+  localStorage.setItem('totalPomodoroTime', totalPomodoroTime.value.toString());
+  localStorage.setItem('totalCountdownTime', totalCountdownTime.value.toString());
+  clearInterval(studyInterval);
+  clearInterval(breakInterval);
+  clearInterval(stopButtonInterval);
 });
 
 const items = [
@@ -210,6 +279,9 @@ const items = [
   }, {
     label: 'Countdown',
     icon: 'i-heroicons-clock',
+  }, {
+    label: 'Stats',
+    icon: 'i-heroicons-chart-bar',
   },
 ];
 </script>

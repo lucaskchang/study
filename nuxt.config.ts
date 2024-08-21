@@ -1,6 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   devtools: { enabled: true },
+
   app: {
     head: {
       title: 'Study Timer',
@@ -18,6 +19,7 @@ export default defineNuxtConfig({
   },
 
   css: ['@/assets/css/styles.scss'],
+
   modules: [
     '@nuxt/ui',
     'nuxt-gtag',
@@ -25,18 +27,24 @@ export default defineNuxtConfig({
     '@pinia/nuxt',
     '@vueuse/nuxt',
   ],
+
   colorMode: {
     classSuffix: '',
   },
+
   googleFonts: {
     families: {},
   },
+
   gtag: {
     id: 'G-QNLZ5NY7HH',
   },
+
   eslint: {
     config: {
       stylistic: true,
     },
   },
+
+  compatibilityDate: '2024-08-21',
 });
