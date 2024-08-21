@@ -168,7 +168,7 @@ const onBreak = ref(false);
 const showStopButton = ref(false);
 const totalPomodoroTime = ref(0);
 const totalCountdownTime = ref(0);
-const doneSound = new Audio('/ding.mp3');
+let doneSound: HTMLAudioElement;
 let studyInterval: NodeJS.Timeout;
 let breakInterval: NodeJS.Timeout;
 let stopButtonInterval: NodeJS.Timeout;
@@ -260,6 +260,7 @@ watch([x, y], () => {
 });
 
 onMounted(() => {
+  doneSound = new Audio('/ding.mp3');
   totalPomodoroTime.value = Number(localStorage.getItem('totalPomodoroTime')) || 0;
   totalCountdownTime.value = Number(localStorage.getItem('totalCountdownTime')) || 0;
 });

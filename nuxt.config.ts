@@ -24,16 +24,11 @@ export default defineNuxtConfig({
     '@nuxt/ui',
     'nuxt-gtag',
     '@nuxt/eslint',
-    '@pinia/nuxt',
     '@vueuse/nuxt',
   ],
 
   colorMode: {
     classSuffix: '',
-  },
-
-  googleFonts: {
-    families: {},
   },
 
   gtag: {
