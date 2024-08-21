@@ -791,6 +791,13 @@
   dependencies:
     "@iconify/types" "*"
 
+"@iconify-json/icon-park-outline@^1.1.16":
+  version "1.1.16"
+  resolved "https://registry.yarnpkg.com/@iconify-json/icon-park-outline/-/icon-park-outline-1.1.16.tgz#4660bc7428d14fc1c3be5d2491dc25c8b8110d28"
+  integrity sha512-q6lQ7Hwke2EGM0I10sl4RQf8OE8CCbUXbBvpbDiPuBofD2uv+0rQwWa65DFYVqzr9BoC3xex8wG+S2gBkdEXFA==
+  dependencies:
+    "@iconify/types" "*"
+
 "@iconify/collections@^1.0.443":
   version "1.0.451"
   resolved "https://registry.yarnpkg.com/@iconify/collections/-/collections-1.0.451.tgz#a3506f157336aae62477c1a3f1ca2336bcf421f3"

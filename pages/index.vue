@@ -239,7 +239,9 @@ function stopStudySession() {
   clearInterval(studyInterval);
   clearInterval(breakInterval);
   studying.value = false;
+  pomodoro.value = false;
   onBreak.value = false;
+  timeLeft.value = 0;
 }
 
 function formatTime(time: number) {
@@ -285,6 +287,25 @@ const items = [
     icon: 'i-heroicons-chart-bar',
   },
 ];
+
+const title = computed(() => {
+  if (studying.value) {
+    if (pomodoro.value) {
+      if (onBreak.value) {
+        return `${formatTime(timeLeft.value)} - Break #${currentRepitition.value}`;
+      }
+      return `${formatTime(timeLeft.value)} - Study Session #${currentRepitition.value}`;
+    }
+    else {
+      return `${formatTime(timeLeft.value)} - Studying`;
+    }
+  }
+  return 'Study Timer';
+});
+
+useHead({
+  titleTemplate: title,
+});
 </script>
 
 <style scoped>
